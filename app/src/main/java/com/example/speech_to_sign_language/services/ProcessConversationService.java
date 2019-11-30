@@ -1,6 +1,5 @@
 package com.example.speech_to_sign_language.services;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,7 +13,7 @@ public class ProcessConversationService {
         this.signLanguageConversions = new SignLanguageConversions();
     }
     
-    public List<Path> processConversation(String conversation) {
+    public List<String> processConversation(String conversation) {
         List<String> wordsList = splitIntoWords(conversation);    
         return convertToASLURLs(wordsList);
     }
@@ -27,10 +26,10 @@ public class ProcessConversationService {
         return wordsList;
     }
 
-    private List<Path> convertToASLURLs(List<String> wordsList) {
+    private List<String> convertToASLURLs(List<String> wordsList) {
         int i = 0;
         int len = wordsList.size();
-        List<Path> aslSignImageURLs = new ArrayList<>();
+        List<String> aslSignImageURLs = new ArrayList<>();
 
         while(i < len) {
             ASLURLModel aslModel = getURLsFromList(i, len, wordsList);
@@ -45,7 +44,7 @@ public class ProcessConversationService {
         // find if any phrase matches to asl 
         for (; end >= start; end--) {
             String termToProcess = joinWithWhitespace(wordsList.subList(start, end));
-            Path url = this.signLanguageConversions.getASLImageUrl(termToProcess);
+            String url = this.signLanguageConversions.getASLImageUrl(termToProcess);
             if (url != null) {
                 return new ASLURLModel(end - start + 1, Collections.singletonList(url));
             }
@@ -53,7 +52,7 @@ public class ProcessConversationService {
 
         // process individual letters
         String wordToProcess = wordsList.get(start);
-        List<Path> letterUrls = new ArrayList<>();
+        List<String> letterUrls = new ArrayList<>();
         for (int i = 0, len = wordToProcess.length(); i < len; i++) {
             String letter = String.valueOf(wordToProcess.charAt(i));
             letterUrls.add(this.signLanguageConversions.getASLImageUrl(letter));
@@ -73,9 +72,9 @@ public class ProcessConversationService {
     
     private class ASLURLModel {
         public int wordsProcessed;
-        public List<Path> finalURLs;
+        public List<String> finalURLs;
 
-        public ASLURLModel(int wordsProcessed, List<Path> urls)  {
+        public ASLURLModel(int wordsProcessed, List<String> urls)  {
             this.wordsProcessed = wordsProcessed;
             this.finalURLs = urls;
         }
