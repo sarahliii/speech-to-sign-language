@@ -1,24 +1,28 @@
+package com.example.speech_to_sign_language.services;
+
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ProcessConversationService {
-    public static final int TOKENS_LENGTH = 4;
+    private static final int TOKENS_LENGTH = 4;
     private SignLanguageConversions signLanguageConversions;
 
     public ProcessConversationService() {
         this.signLanguageConversions = new SignLanguageConversions();
     }
     
-    public processConversation(String conversation) {
+    public List<String> processConversation(String conversation) {
         List<String> wordsList = splitIntoWords(conversation);    
-        processSentences(wordsList);
+        return convertToASLURLs(wordsList);
     }
 
-    public List<String> splitIntoWords(String conversation) {
+    private List<String> splitIntoWords(String conversation) {
         String lowercased = conversation.toLowerCase();
         String withoutPunctuation = lowercased.replaceAll("[^a-z ]", "");
         String[] words = withoutPunctuation.split(" ");
-        ArrayList<String> wordsList = Arrays.asList(words);
+        List<String> wordsList = Arrays.asList(words);
         return wordsList;
     }
 
@@ -35,14 +39,14 @@ public class ProcessConversationService {
         return aslSignImageURLs;
     }
 
-    private getURLsFromList(int start, int listSize, List<String> wordsList) {
+    private ASLURLModel getURLsFromList(int start, int listSize, List<String> wordsList) {
         int end = start + TOKENS_LENGTH < listSize - 1 ? start + TOKENS_LENGTH : listSize - 1;
         // find if any phrase matches to asl 
         for (; end >= start; end--) {
-            String termToProcess = String.join(" ", wordsList.subList(start, end));
-            String url = this.signLanguageConversions.getASLImageURL(termToProcess);
+            String termToProcess = joinWithWhitespace(wordsList.subList(start, end));
+            String url = this.signLanguageConversions.getASLImageUrl(termToProcess);
             if (url != null) {
-                return new ASLURLModel(end - start + 1, List.of(url));
+                return new ASLURLModel(end - start + 1, Collections.singletonList(url));
             }
         }
 
@@ -51,9 +55,19 @@ public class ProcessConversationService {
         List<String> letterUrls = new ArrayList<>();
         for (int i = 0, len = wordToProcess.length(); i < len; i++) {
             String letter = String.valueOf(wordToProcess.charAt(i));
-            letterUrls.add(this.signLanguageConversions.getASImageURL(letter));
+            letterUrls.add(this.signLanguageConversions.getASLImageUrl(letter));
         }
         return new ASLURLModel(1, letterUrls);
+    }
+
+    private String joinWithWhitespace(List<String> subList) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0, len = subList.size() - 1; i < len; i++) {
+            builder.append(subList.get(i));
+            builder.append(" ");
+        }
+        builder.append(subList.get(subList.size() - 1));
+        return builder.toString();
     }
     
     private class ASLURLModel {

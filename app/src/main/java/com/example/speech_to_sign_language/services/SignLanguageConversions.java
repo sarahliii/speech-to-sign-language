@@ -1,3 +1,7 @@
+package com.example.speech_to_sign_language.services;
+
+import java.util.HashMap;
+
 public class SignLanguageConversions {
     public HashMap<String, String> wordsToASL;
 
