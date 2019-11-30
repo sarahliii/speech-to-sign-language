@@ -10,13 +10,13 @@ public class ProcessConversationService {
     }
     
     public processConversation(String conversation) {
-        conversation = conversation.toLowerCase();
         List<String> wordsList = splitIntoWords(conversation);    
         processSentences(wordsList);
     }
 
     public List<String> splitIntoWords(String conversation) {
-        String withoutPunctuation = conversation.replaceAll("[^a-zA-Z ]", "");
+        String lowercased = conversation.toLowerCase();
+        String withoutPunctuation = lowercased.replaceAll("[^a-z ]", "");
         String[] words = withoutPunctuation.split(" ");
         ArrayList<String> wordsList = Arrays.asList(words);
         return wordsList;
