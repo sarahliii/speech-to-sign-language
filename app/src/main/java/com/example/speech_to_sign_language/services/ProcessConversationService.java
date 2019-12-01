@@ -46,7 +46,7 @@ public class ProcessConversationService {
         int end = start + TOKENS_LENGTH < listSize - 1 ? start + TOKENS_LENGTH : listSize - 1;
         // find if any phrase matches to asl
         for (; end >= start; end--) {
-            String termToProcess = joinWithWhitespace(wordsList.subList(start, end));
+            String termToProcess = joinWithWhitespace(wordsList.subList(start, end + 1));
             String url = this.signLanguageConversions.getASLImageUrl(termToProcess);
             if (url != null) {
                 return new ASLURLModel(end - start + 1, Collections.singletonList(url));
