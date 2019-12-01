@@ -137,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
         for(String path : listPath)
         {
             String name = path.substring(0, path.length() - 4);
+            if (path.equals("images/_.png")) name = "";
             LinearLayout vertLayout = new LinearLayout(this);
             vertLayout.setOrientation(LinearLayout.VERTICAL);
             TextView textView = new TextView(this);

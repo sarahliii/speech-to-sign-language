@@ -37,6 +37,7 @@ public class ProcessConversationService {
         while(i < len) {
             ASLURLModel aslModel = getURLsFromList(i, len, wordsList);
             aslSignImageURLs.addAll(aslModel.finalURLs);
+            aslSignImageURLs.add(signLanguageConversions.getASLImageUrl(" "));
             i += aslModel.wordsProcessed;
         }
         return aslSignImageURLs;

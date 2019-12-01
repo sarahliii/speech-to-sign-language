@@ -31,6 +31,7 @@ public class SignLanguageConversions {
                 wordsToASL.put(withWhiteSpace, image);
                 aslToWords.put(image, withWhiteSpace);
             }
+            wordsToASL.put(" ", "images/_.png");
         } catch(Exception e) {
             System.out.println("oopsies");
         }
