@@ -8,11 +8,18 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class SplashActivity extends AppCompatActivity {
 
-    @Override
+    private static int SPLASH_TIME_OUT = 2000;
+
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-        finish();
+
+        new Handler().postDelayed (new Runnable() {
+            @Override
+            public void run() {
+                Intent i = new Intent (SplashActivity.this, MainActivity.class);
+                startActivity(i);
+                finish ();
+            }
+        }, SPLASH_TIME_OUT);
     }
 }
