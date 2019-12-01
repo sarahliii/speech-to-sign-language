@@ -1,6 +1,7 @@
 package com.example.speech_to_sign_language;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import android.app.Activity;
 import android.content.res.AssetManager;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,11 +35,31 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import com.example.speech_to_sign_language.services.ProcessConversationService;
+import com.microsoft.cognitiveservices.speech.CancellationDetails;
+import com.microsoft.cognitiveservices.speech.ResultReason;
+import com.microsoft.cognitiveservices.speech.SpeechConfig;
+import com.microsoft.cognitiveservices.speech.SpeechRecognitionResult;
+import com.microsoft.cognitiveservices.speech.SpeechRecognizer;
+import com.microsoft.cognitiveservices.speech.audio.AudioConfig;
+
+import static android.Manifest.permission.INTERNET;
+import static android.Manifest.permission.RECORD_AUDIO;
+import static com.example.speech_to_sign_language.APIKeys.serviceRegion;
+import static com.example.speech_to_sign_language.APIKeys.speechSubscriptionKey;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    private EditText editText;
+    private ImageButton button;
+    private SpeechRecognizer reco;
+    private boolean isActive = false;
+    private String inputText;
     public HashMap<String, Integer> map = new HashMap<>();
 
     @Override
@@ -67,6 +90,17 @@ public class MainActivity extends AppCompatActivity {
 //
 //        // Data bind GridView with ArrayAdapter (String Array elements)
 //        signImagesGrid.setAdapter(gridViewArrayAdapter);
+        editText = findViewById(R.id.inputText);
+        button = findViewById(R.id.imageButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickRecordSpeechButton(v);
+            }
+        });
+        // Note: we need to request the permissions
+        int requestCode = 5; // unique code for the permission request
+        ActivityCompat.requestPermissions(MainActivity.this, new String[]{RECORD_AUDIO, INTERNET}, requestCode);
     }
 
 
@@ -159,5 +193,83 @@ public class MainActivity extends AppCompatActivity {
             bitmap = null;
         }
         return bitmap;
+    }
+
+    public void onClickRecordSpeechButton(View v) {
+        isActive = !isActive;
+        if (isActive) {
+            button.setImageResource(R.drawable.stop_recording);
+            EditText txt = findViewById(R.id.inputText); // 'hello' is the ID of your text view
+            try {
+                SpeechConfig config = SpeechConfig.fromSubscription(speechSubscriptionKey, serviceRegion);
+                assert(config != null);
+                final AudioConfig audioInput = AudioConfig.fromDefaultMicrophoneInput();
+                reco = new SpeechRecognizer(config, audioInput);
+                assert(reco != null);
+                Future<SpeechRecognitionResult> task = reco.recognizeOnceAsync();
+                assert(task != null);
+                setOnTaskCompletedListener(task, result -> {
+                    String s = result.getText();
+                    reco.close();
+                    if (result.getReason() != ResultReason.RecognizedSpeech) {
+                        String errorDetails = (result.getReason() == ResultReason.Canceled) ? CancellationDetails.fromResult(result).getErrorDetails() : "";
+                        System.out.println(errorDetails);
+                        s = "";
+                    } else {
+                        setRecognizedText(s);
+                    }
+                    enableButtons();
+                });
+
+            } catch (Exception ex) {
+                Log.e("SpeechSDKDemo", "unexpected " + ex.getMessage());
+                assert(false);
+            }
+            editText.setText(txt.getText());
+        } else {
+            if (reco != null) {
+                reco.stopContinuousRecognitionAsync();
+                button.setImageResource(R.drawable.record);
+            }
+        }
+    }
+
+    private void setRecognizedText(final String s) {
+        AppendTextLine(s, true);
+    }
+
+    private void AppendTextLine(final String s, final Boolean erase) {
+        MainActivity.this.runOnUiThread(() -> {
+            if (erase) {
+                editText.setActivated(false);
+                editText.setText(s);
+            } else {
+                String txt = editText.getText().toString();
+                editText.setText(txt + System.lineSeparator() + s);
+            }
+        });
+    }
+
+    private void enableButtons() {
+        MainActivity.this.runOnUiThread(() -> {
+            button.setEnabled(true);
+        });
+    }
+
+    private <T> void setOnTaskCompletedListener(Future<T> task, MainActivity.OnTaskCompletedListener<T> listener) {
+        s_executorService.submit(() -> {
+            T result = task.get();
+            listener.onCompleted(result);
+            return null;
+        });
+    }
+
+    private interface OnTaskCompletedListener<T> {
+        void onCompleted(T taskResult);
+    }
+
+    private static ExecutorService s_executorService;
+    static {
+        s_executorService = Executors.newCachedThreadPool();
     }
 }
