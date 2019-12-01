@@ -3,7 +3,7 @@
 
     <item android:drawable="@color/colorPrimary" />
 
-    <item>
+    <item android:name="SplashActivityTheme">
         <bitmap android:src="@drawable/splash"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" />
