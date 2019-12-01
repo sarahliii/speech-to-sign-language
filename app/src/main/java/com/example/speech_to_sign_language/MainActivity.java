@@ -48,4 +48,3 @@ public class MainActivity extends AppCompatActivity {
         signImagesGrid.setAdapter(gridViewArrayAdapter);
     }
 }
->>>>>>> Stashed changes
