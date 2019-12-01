@@ -15,6 +15,7 @@ public class SignLanguageConversions {
     private Resources resources;
 
     public SignLanguageConversions(Resources resources) {
+        this.resources = resources;
         this.wordsToASL = new HashMap<String, String>();
         this.aslToWords = new HashMap<String, String>();
         initWordsToASLDict();
