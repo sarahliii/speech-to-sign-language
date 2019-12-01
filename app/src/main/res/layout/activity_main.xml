@@ -6,12 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/debugText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
-
     <ImageButton
         android:id="@+id/recordButton"
         android:layout_width="wrap_content"
@@ -22,7 +16,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@mipmap/ic_launcher_round" />
+        app:srcCompat="@drawable/translate" />
 
     <EditText
         android:id="@+id/inputText"
@@ -45,10 +39,11 @@
         android:id="@+id/imageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="49dp"
+        android:layout_marginBottom="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/inputText"
-        app:srcCompat="@drawable/record"
-        tools:layout_editor_absoluteX="224dp" />
+        app:layout_constraintStart_toEndOf="@+id/recordButton"
+        app:srcCompat="@drawable/record" />
 
     <LinearLayout
         android:id="@+id/linearLayout"

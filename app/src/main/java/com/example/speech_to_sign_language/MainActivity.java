@@ -67,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final TextView debugText = findViewById(R.id.debugText);
         final EditText inputText = findViewById(R.id.inputText);
         final GridView signImagesGrid = findViewById(R.id.signImagesGrid);
 
@@ -107,10 +106,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickRecordButton(View view) {
         hideKeyboard(this);
-        final TextView debugTextView = findViewById(R.id.debugText);
         final TextView inputTextView = findViewById(R.id.inputText);
         final String inputText = inputTextView.getText().toString();
-        debugTextView.setText(inputText);
 //
 //        final GridView signImagesGrid = findViewById(R.id.signImagesGrid);
 //
@@ -131,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
         for (String p : listPath) {
             pp += p;
         }
-        debugTextView.setText(pp);
 
         LinearLayout layout = findViewById(R.id.linearLayout);
         layout.removeAllViews();
